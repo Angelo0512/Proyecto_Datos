@@ -10,14 +10,14 @@ public:
 
     Nodo(T c) {
         cont = c;
-        this->sig = NULL;
-        this->ant = NULL;
+        this->sig = nullptr;
+        this->ant = nullptr;
     }
 
     Nodo() {
         cont = 0;
-        this->sig = NULL;
-        this->ant = NULL;
+        this->sig = nullptr;
+        this->ant = nullptr;
     }
 };
 
@@ -25,21 +25,23 @@ template<typename T>
 class LinkedList {
 private:
     Nodo<T>* head;
+    Nodo<T>* last;
 public:
     LinkedList() {
-        this->head = NULL;
+        this->head = nullptr;
+        this->last = this->head;
     }
 
     void insertarFinal(T elem) {
         Nodo<T>* nodo = new Nodo<T>;
         nodo->cont = elem;
-        if (head == NULL) {
+        if (head == nullptr) {
             head = nodo;
             return;
         }
         Nodo<T>* temp = head;
         Nodo<T>* prev = nullptr;
-        while (temp->sig != NULL) {
+        while (temp->sig != nullptr) {
             prev = temp;
             temp = temp->sig;
         }
@@ -51,7 +53,7 @@ public:
     void insertarInicio(T item) {
         Nodo<T>* n = new Nodo<T>[1];
         n->cont = item;
-        if (head == NULL) {
+        if (head == nullptr) {
             head = n;
             return;
         }
@@ -63,7 +65,7 @@ public:
     int length() {
         int len = 0;
         Nodo<int>* temp = head;
-        while (temp != NULL) {
+        while (temp != nullptr) {
             len++;
             temp = temp->sig;
         }
@@ -71,30 +73,34 @@ public:
     }
 
     void imprimir() {
-        if (head == NULL) {
+        if (head == nullptr) {
             cout << "No hay elementos en la lista" << endl;
             return;
         }
         Nodo<T>* temp = head;
-        while (temp != NULL) {
+        while (temp != nullptr) {
             cout << temp->cont << ", ";
             temp = temp->sig;
         }
     }
 
     void eliminar() {
-        if (head == NULL) {
+        //Lista vacia
+        if (head == nullptr) {
             cout << "lista vacia" << endl;
             return;
         }
-        if (head->sig == NULL) {
-            head = NULL;
+        //Elimina primero
+        if (head->sig == nullptr) {
+            delete head;
             return;
         }
+        //Busca pos y elimina
         Nodo<T>* temp = head;
-        while (temp != NULL) {
-            if (temp->sig->sig == NULL) {
-                temp->sig = NULL;
+        while (temp != nullptr) {
+            if (temp->sig->sig == nullptr) {
+                last = last->ant;
+                delete temp->sig;
                 break;
             }
             temp = temp->sig;
@@ -103,7 +109,7 @@ public:
     }
 
     void eliminar(int pos) {
-        if (head == NULL) {
+        if (head == nullptr) {
             cout << "linked list is empty !" << endl;
             return;
         }
@@ -118,7 +124,7 @@ public:
         }
         int count = 0;
         Nodo<T>* temp = head;
-        while (temp != NULL) {
+        while (temp != nullptr) {
             if (count == pos - 1) {
                 temp->sig = temp->sig->sig;
                 cout << "item removed at index " << pos << endl;
@@ -130,7 +136,7 @@ public:
     }
 
     void eliminarFinal() {
-        if (head == NULL) {
+        if (head == nullptr) {
             cout << "lista vacia" << endl;
             return;
         }
@@ -139,7 +145,7 @@ public:
     }
 
     T get(int index) {
-        if (head == NULL) {
+        if (head == nullptr) {
             cout << "lista vacia" << endl;
             return -1;
         }
@@ -153,7 +159,7 @@ public:
         int count = 0;
         T res = NULL;
         Nodo<T>* temp = head;
-        while (temp != NULL) {
+        while (temp != nullptr) {
             if (count++ == index) {
                 res = temp->cont;
                 break;
@@ -163,4 +169,35 @@ public:
         return res;
     }
 
+    Nodo<T>* getNodo(int index) {
+        if (head == nullptr) {
+            cout << "lista vacia" << endl;
+            return nullptr;
+        }
+        if (index >= length() || index < 0) {
+            cout << "posición inválida" << endl;
+            return nullptr;
+        }
+        if (index == 0) {
+            return head;
+        }
+        int count = 0;
+        T res = NULL;
+        Nodo<T>* temp = head;
+        while (temp != nullptr) {
+            if(count++ == index)
+                return temp;
+            temp = temp->sig;
+        }
+        return nullptr;
+    }
+    
+    void swap(int a, int b) {
+        int len = length();
+        if (len && a < len && b < len && a != b) {
+            Nodo<T>* nodoA =  getNodo(a);
+            Nodo<T>* nodoB = getNodo(b);
+            std::swap(nodoA->cont, nodoB->cont);
+        }
+    }
 };

@@ -9,7 +9,15 @@ int main() {
 	l1->insertarFinal(5);
 	l1->insertarFinal(3);
 
+	cout << l1->getNodo(0)->cont << '\n';
 
-	cout << l1->get(3);
+	l1->imprimir();
+
+
+	l1->swap(0, 3);
+
+	cout << endl;
+
+	l1->imprimir();
 	return 0;
 }
