@@ -15,9 +15,9 @@ void Menu::mostrar() {
         std::cout << "     | ------------------------------------------------  |";
         std::cout << "     |-->DIGITE 3:| Mostrar usuario prioritario          |";
         std::cout << "     | -----------------------------------------------   |";
-        std::cout << "     |-->DIGITE 3:| Ver elementos en la cola             |";
+        std::cout << "     |-->DIGITE 4:| Ver elementos en la cola             |";
         std::cout << "     | -----------------------------------------------   |";
-        std::cout << "     |-->DIGITE 4:| Insertar una lista a una cola        |";
+        std::cout << "     |-->DIGITE 5:| Insertar una lista a una cola        |";
         std::cout << "     | -----------------------------------------------   |";
         std::cout << "     |-->DIGITE 0:| Salir                                |";
         std::cout << "     |___________________________________________________|";
@@ -30,7 +30,7 @@ void Menu::mostrar() {
         }
 
         case 2: {
-            modificar();
+            eliminar();
             break;
         }
 
@@ -41,15 +41,6 @@ void Menu::mostrar() {
 
         case 4: {
             ingresarDinero();
-            break;
-        }
-        case 5: {
-            retirarDinero();
-            break;
-        }
-        case 6: {
-            maquinaAdmin->toString();
-            pausa();
             break;
         }
         case 0: {
@@ -82,5 +73,5 @@ void Menu::insertar(){
 }
 
 void Menu::eliminar() {
-    cola->eliminar();
+    cola->dequeue();
 }

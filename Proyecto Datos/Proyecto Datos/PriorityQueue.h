@@ -4,7 +4,7 @@
 #include "Heap.h"
 
 template <class T>
-class PriorityQueue {
+class PriorityQueue : public IPriorityQueue {
 private:
 	Heap<T>* elementos;
 	bool tipoPriorityQueue;
@@ -33,7 +33,7 @@ public:
 		delete elementos;
 	}
 
-	
+
 	void enqueue(T dato) {
 		elementos->insertar(dato);
 	}

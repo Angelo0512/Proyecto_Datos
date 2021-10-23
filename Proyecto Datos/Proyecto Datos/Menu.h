@@ -1,9 +1,10 @@
 #pragma once
+#include "IPriorityQueue.h"
+#include "Usuario.h"
 #include <iostream>
-class Menu
-{
+class Menu{
 private:
-	//IColaPrioridad ColaPrioridad = ColaPrioridad();
+	IPriorityQueue PriorityQueue = PriorityQueue ();
 public:
 	void mostrar();
 
