@@ -2,6 +2,13 @@
 #include "DoubleList.h"
 
 /*
+	Estudiantes:
+	Angelo Calvo Murillo
+	Gabriel Alvarado Martinez
+	Santiago Osorio Castaneda
+
+*/
+/*
 Enlaces visitados:
 	http://algorithmics.lsi.upc.edu/docs/pqueues.pdf
 	https://www.youtube.com/watch?v=RBSGKlAvoiM&t=6746s
@@ -14,10 +21,5 @@ Enlaces visitados:
 using namespace std;
 
 int main() {
-	DoubleList<int>* l1 = new DoubleList<int>();
-	l1.push_bach(1);
-	l1.push_bach(2);
-	l1.push_bach(3);
-
 	return 0;
 }

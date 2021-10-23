@@ -1,128 +1,124 @@
-#ifndef LISTA_DOBLE
-#define LISTA_DOBLE
-
-
+#ifndef DOUBLE_LIST
+#define DOUBLE_LIST
 #include <sstream>
 
 template<class T>
 class DoubleList {
 private:
 	struct Node {
-		T info;
-		int indice;
+		T value;
+		int index;
 		Node* next;
 		Node* prev;
-
-		Node(T val, Node* ant = nullptr, Node* sig = nullptr) : info{ val }, prev{ ant }, next{ sig }{
-			indice = -1;//Inicializado para que no de warning
-		}
+		//Constructor del Nodo, index empieza en 1 pero como al inicio no hay objeto en la lista index va a ser 0
+		Node(T val, Node* ant = nullptr, Node* sig = nullptr) : value{ val }, index{ 0 }, prev{ ant }, next{ sig }{ }
 	};
 
-	Node* inicio;
-	int cantidad;
-	void Inicializar() {
-		inicio = nullptr;
-		cantidad = 0;
-
-	}
+	Node* begin = nullptr;
+	int amount = 0;
 
 public:
 
-	typedef Node* listaptr;
-	typedef Node* const_listaptr;
+	typedef Node* listptr;
+	typedef Node* const_listptr;
 
+	//Constructor por defecto
+	DoubleList() = default;
 
-	DoubleList() { Inicializar(); }
+	//Constructor copia
+	explicit DoubleList(const DoubleList& list) {
+		if (list.begin) {
+			Node* newNode = new Node(list.begin->value);
+			amount = list.amount;
+			newNode->index = list.begin->index;
+			begin = newNode;
+			listptr current = begin, currentList = list.begin->next;
 
-	// Constructor de copia
-	explicit DoubleList(const DoubleList& obj) {
-		cantidad = 0;//inicializada para evitar warning de Visual Studio
-		if (obj.inicio == nullptr)
-			inicio = nullptr;
-		else {
-			Node* nuevo = nullptr;
-			cantidad = obj.cantidad;
-			nuevo = new Node(obj.inicio->info);
-			nuevo->indice = obj.inicio->indice;
-			inicio = nuevo;
-			listaptr actual = inicio;
-			listaptr actualObj = obj.inicio->next;
-			while (actualObj != nullptr) {
-				nuevo = new Node(actualObj->info);
-				nuevo->indice = actualObj->indice;
-				actual->next = nuevo;
-				actual->next->prev = actual;
-				actual = actual->next;
-				actualObj = actualObj->next;
+			while (currentList != nullptr) {
+				newNode = new Node(currentList->value);
+				newNode->index = currentList->index;
+				current->next = newNode;
+				current->next->prev = current;
+				current = current->next;
+				currentList = currentList->next;
 			}
 		}
 	}
 
-	~DoubleList() { BorrarLista(); }
+	//Elimina los elementos de la lista doble
+	~DoubleList() {
+		listptr tmp;
 
-	// Retorna la cantidad de elementos que se encuentran en la lista
-	int getCantidad() {
-		return cantidad;
+		while (begin) {
+			tmp = begin;
+			begin = begin->next;
+			delete tmp;
+		}
+		amount = 0;
 	}
-	 
-	//  Inserta un elemento 
-	void insertar(const T& val) {
-		listaptr nuevo;
+
+	//Este metodo devuelve la cantidad de elementos en la lista doble
+	int getAmount() {
+		return amount;
+	}
+
+	//Agregar un elementos en la lista doble
+	void add(const T& val) {
+		listptr newNode;
 
 		try {
-			nuevo = new Node(val);
+			newNode = new Node(val);
 		}
 		catch (std::bad_alloc exception) {
 			return;
 		}
 
-		if (inicio == nullptr) {
-			inicio = nuevo;
-			inicio->indice = 1;
-			cantidad++;
+		if (!begin) {
+			begin = newNode;
+			begin->index = 1;
+			amount++;
 		}
 		else {
-			listaptr tmp = inicio;
-			while (tmp->next != nullptr)
+			listptr tmp = begin;
+			while (tmp->next)
 				tmp = tmp->next;
-			nuevo->indice = (tmp->indice) + 1;
-			tmp->next = nuevo;
-			nuevo->prev = tmp;
-			cantidad++;
+			newNode->index = (tmp->index) + 1;
+			tmp->next = newNode;
+			newNode->prev = tmp;
+			amount++;
 		}
 	}
 
-
-	void Eliminar(listaptr puntero) {
-		if (puntero == nullptr || inicio == nullptr)
+	// Elimina un elemento de la lista doble a partir de un puntero de un nodo
+	void remove(listptr ptr) {
+		if (!ptr || !begin)
 			return;
 
-		if (inicio == puntero) {
-			if (inicio->next) {
-				inicio = inicio->next;
-				inicio->prev = nullptr;
+		if (begin == ptr) {
+			if (begin->next) {
+				begin = begin->next;
+				begin->prev = nullptr;
 			}
 			else {
-				inicio = inicio->next;
+				begin = begin->next;
 			}
-			delete puntero;
-			cantidad--;
-
+			delete ptr;
+			amount--;
 		}
 
 		else {
-			listaptr tmp = inicio;
-			listaptr tmp2 = tmp->next;
+			listptr tmp = begin;
+			listptr tmp2 = tmp->next;
 
-			while (tmp2 != nullptr) {
-				if (tmp2 == puntero) {
+			while (tmp2) {
+				if (tmp2 == ptr) {
 					tmp->next = tmp2->next;
 
-					if (tmp2->next != nullptr)
+					if (tmp2->next)
 						tmp2->next->prev = tmp;
 
 					delete tmp2;
-					cantidad--;
+					amount--;
 					return;
 				}
 				tmp = tmp2;
@@ -131,53 +127,42 @@ public:
 		}
 	}
 
-	//Elimina el elemento en la posición seleccionada
-	void EliminarEnPos(int pos)
+	// Elimina un elemento de la lista doble a partir de una posicion
+	void removePos(int pos)
 	{
 		if (pos <= 0)
 			return;
 
-		listaptr tmp = inicio;
+		listptr tmp = begin;
 		for (int i = 1; i < pos; ++i) {
 			tmp = tmp->next;
-			if (tmp == nullptr)
+			if (!tmp)
 				return;
 		}
-		Eliminar(tmp);
+		remove(tmp);
 	}
 
-	// Borra la lista
-	void BorrarLista() {
-		listaptr tmp;
-		while (inicio != nullptr) {
-			tmp = inicio;
-			inicio = inicio->next;
-			delete tmp;
-		}
-		cantidad = 0;
-	}
+	// Devuelve el index del ultimo elemento en la lista
+	int getLastIndex() {
 
-	// Retorna el índice final
-	int obtieneIndiceFinal() {
+		listptr tmp = begin;
 
-		listaptr tmp = inicio;
-
-		while (tmp->next != nullptr) {
+		while (tmp->next) {
 			tmp = tmp->next;
 		}
 
-		return tmp->indice;
+		return tmp->index;
 	}
 
-	// Si existe el nodo en la posición indicada se retorna, si no, se retorna nullptr
-	Node* obtenerEnPoscicion(int posicion) {
-		if (posicion <= 0)
+	// Devuelve un elemento en la posicion indicada
+	Node* getElementPos(int pos) {
+		if (pos <= 0)
 			return nullptr;
-		if (inicio) {
-			listaptr tmp = inicio;
-			for (int i = 1; i < posicion; ++i) {
+		if (begin) {
+			listptr tmp = begin;
+			for (int i = 1; i < pos; ++i) {
 				tmp = tmp->next;
-				if (tmp == nullptr)
+				if (!tmp)
 					return nullptr;
 			}
 			return tmp;
@@ -187,48 +172,48 @@ public:
 
 	}
 
-	//Compara los nodos en la posicion "i" y "j" y retorna la posicion del mayor
-	int compararMayor(int i, int j) {
-		Node* a = obtenerEnPoscicion(i);
-		Node* b = obtenerEnPoscicion(j);
+	//Recibe dos posiciones y determinar cual nodo, en la posicion indicada, es mayor
+	int compareMax(int i, int j) {
+		Node* a = getElementPos(i);
+		Node* b = getElementPos(j);
 
 		if (a && b) {
-			if (b->info > a->info)
-				return b->indice;
-			return a->indice;
+			if (b->value > a->value)
+				return b->index;
+			return a->index;
 		}
 		if (a && !b) {
-			return a->indice;
+			return a->index;
 		}
 		return -1;
 	}
 
-	//Compara los nodos en la posicion "i" y "j" y retorna la posicion del menor
-	int compararMenor(int i, int j) {
-		Node* a = obtenerEnPoscicion(i);
-		Node* b = obtenerEnPoscicion(j);
+	//Recibe dos posiciones y determinar cual nodo, en la posicion indicada, es menor
+	int compareMin(int i, int j) {
+		Node* a = getElementPos(i);
+		Node* b = getElementPos(j);
 
 		if (a && b) {
-			if (b->info < a->info)
-				return b->indice;
-			return a->indice;
+			if (b->value < a->value)
+				return b->index;
+			return a->index;
 		}
 		if (a && !b) {
-			return a->indice;
+			return a->index;
 		}
 		return -1;
 	}
 
-	//Intercambia los nodo en pos1 y pos2
-	void intercambiar(int pos1, int pos2) {
-		Node* i = obtenerEnPoscicion(pos1);
-		Node* j = obtenerEnPoscicion(pos2);
+	//Intercambia los nodos en la posiciones indicadas
+	void swap(int pos1, int pos2) {
+		Node* i = getElementPos(pos1);
+		Node* j = getElementPos(pos2);
 		Node* aux = nullptr;
 
 		if (i && j) {
 
-			cambiarIndice(i, j);
-			if (esAdyacente(i, j)) {//Verifica si los nodos son adyacentes
+			changeIndex(i, j);
+			if (isAdjacent(i, j)) {
 				if (i->prev)  i->prev->next = j;
 				if (j->next) j->next->prev = i;
 				j->prev = i->prev;
@@ -236,8 +221,8 @@ public:
 				aux = j->next;
 				j->next = i;
 				i->next = aux;
-				if (inicio == i)//En caso de que haya que reajustar el nodo inicio
-					inicio = j;
+				if (begin == i)
+					begin = j;
 			}
 			else {
 				if (i->prev)  i->prev->next = j;
@@ -251,15 +236,15 @@ public:
 				temp = i->next;
 				i->next = j->next;
 				j->next = temp;
-				if (inicio == i)//En caso de que haya que reajustar el nodo inicio
-					inicio = j;
+				if (begin == i)
+					begin = j;
 			}
 
 		}
 	}
 
-	//Retorna verdadero si los nodos recibidos son adyacentes
-	bool esAdyacente(Node* i, Node* j) {
+	//Verifica si dos nodos son adyacentes
+	bool isAdjacent(Node* i, Node* j) {
 
 		if (i->next == j || i->prev == j)
 			return true;
@@ -268,46 +253,45 @@ public:
 		return false;
 	}
 
-	//Cambia el indice de los nodos "i" y "j"
-	void cambiarIndice(Node* i, Node* j) {
-		int indiceAux = i->indice;
-		i->indice = j->indice;
-		j->indice = indiceAux;
+	//Intercambia los indices de dos nodos
+	void changeIndex(Node* i, Node* j) {
+		int indexAux = i->index;
+		i->index = j->index;
+		j->index = indexAux;
 	}
 
-	// 
-	T obtenerInfoDelPrimero() {
-		if (!estaVacia()) {
-			T info = inicio->info;
-			intercambiar(1, cantidad);
-			EliminarEnPos(cantidad);
-			return info;
+	//Pop del primer valor de la lista doble
+	T getFirstValue() {
+		if (!isEmpty()) {
+			T value = begin->value;
+			swap(1, amount);
+			removePos(amount);
+			return value;
 		}
-		return inicio->info;
+		return begin->value;
 	}
 
-	// Retorna verdadero si la lista está vacía
-	bool estaVacia() {
-		if (!inicio)
+	//Determina si la lisat doble esta vacia
+	bool isEmpty() {
+		if (!begin)
 			return true;
 		return false;
 	}
 
-	// Genera un toString con todos los nodos de la lista 
+	//toString
 	std::string toString() {
 		std::stringstream s;
 
-		listaptr tmp = inicio;
+		listptr tmp = begin;
 
-		while (tmp != nullptr) {
-			s << "[" << tmp->info << "] ";
+		while (tmp) {
+			s << "[" << tmp->value << "] ";
 			tmp = tmp->next;
 		}
 		s << std::endl;
 
 		return s.str();
 	}
-
 };
 
-#endif // !LISTA_DOBLE
+#endif // !DOUBLE_LIST

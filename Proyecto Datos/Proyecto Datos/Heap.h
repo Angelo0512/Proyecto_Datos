@@ -10,137 +10,134 @@ template <class T>
 class Heap {
 
 private:
-	ListaDoble<T>* lista;
-	bool tipoHeap; //Si es 1 es un maxHeap, si es 2 es un minHeap
+	DoubleList<T>* list;
+	bool type;
 
 public:
-
-	static const int maxHeap = Max_Heap;
-	static const int minHeap = Min_Heap;
-
-	//Recibe por parametro el tipo de Heap: de maximos o minimos
-	Heap(bool tipo = true) {
-		tipoHeap = tipo;
-		lista = new ListaDoble<T>();
+	//En este constructor recibe un booleano que determina el tipo heap: true = maxHeap, false = minHeap
+	Heap(bool type = true) {
+		this->type = type;
+		list = new DoubleList<T>();
 	}
 
-	//Crea un heap a partir de una lista enlazada doble, tambien recibe por parametro el tipo de Heap: de maximos o minimos
-	Heap(ListaDoble<T>* list, bool tipo = true) {
-		tipoHeap = tipo;
-		lista = list;
-		crearHeap();
+	//En este constructor recibe un puntero de una lista para ser copia en la lista del heap y recibe un booleano para determinar el tipo de heap
+	Heap(DoubleList<T>* list, bool type = true) {
+		this->type = type;
+		this->list = list;
+		createHeap();
 	}
 
 	//Constructor copia
 	explicit Heap(const Heap& obj) {
-		tipoHeap = obj.tipoHeap;
-		lista = new ListaDoble<T>(*obj.lista);
+		type = obj.type;
+		list = new DoubleList<T>(*obj.list);
 	}
 
+	//Borra la lista doble del heap
 	~Heap() {
-		delete lista;
+		delete list;
 	}
 
-	void insertar(const T& t) {
-		lista->insertar(t);
-		int indice = lista->obtieneIndiceFinal();
-		heapifyBubbleUp(indice);
+	//Este metodo agrega un valor en la lista doble
+	void add(const T& val) {
+		list->add(val);
+		int index = list->getLastIndex();
+		heapifyUp(index);
 	}
 
-	int obtenerPadre(int i) {
+	//Los tres siguientes metodos obtiene la posicion de:
+	//Del padre
+	int getParent(int i) {
 		return (i) / 2;
 	}
-
-	int obtenerIzq(int i) {
+	//Del hijo izquierdo
+	int getLeft(int i) {
 		return i * 2;
 	}
-
-	int obtenerDer(int i) {
+	//Del hijo derecho
+	int getRight(int i) {
 		return i * 2 + 1;
 	}
 
-	//Utilizado para mantener la propirdad de un heap cada vez que se inserta
-	void heapifyBubbleUp(int i) {
-		int padre = obtenerPadre(i);
-		int izq = obtenerIzq(padre);
-		int der = obtenerDer(padre);
-		int mayorPrioridad = -1;
-		if (i > 0) { //El padre siempre es mayor que cero ya que el indice de lista inicia en 1
-			if (tipoHeap)
-				mayorPrioridad = lista->compararMayor(izq, der);//Se busca el mayor entre los hermanos
-			if (!tipoHeap)
-				mayorPrioridad = lista->compararMenor(izq, der);//Se busca el mayor entre los hermanos
-			if (mayorPrioridad != -1) {
-				if (tipoHeap)
-					mayorPrioridad = lista->compararMayor(mayorPrioridad, padre);//Se busca el mayor entre el hijo y el padre
-				if (!tipoHeap)
-					mayorPrioridad = lista->compararMenor(mayorPrioridad, padre);//Se busca el mayor entre el hijo y el padre
-				if (mayorPrioridad != padre) {//Si el mayor es diferente al padre
-					lista->intercambiar(padre, mayorPrioridad);
-					heapifyBubbleUp(padre); //Como hubo un intercambio entre el padre y el hijo, la posicion del antiguo padre cambio con la del hijo
-											//Entonces el que ahora es padre tomo el indice del padre anterior, por eso se repite recursivamente heapify
+	//Utilizado para mantener la propiedad de un heap cada vez que se inserta
+	void heapifyUp(int i) {
+		int parent = getParent(i);
+		int left = getLeft(parent);
+		int right = getRight(parent);
+		int maxPriority = -1;
+		if (i > 0) { //El padre siempre es mayor que cero ya que el indice de list inicia en 1
+			if (type)
+				maxPriority = list->compareMax(left, right);
+			else
+				maxPriority = list->compareMin(left, right);
+			if (maxPriority != -1) {
+				if (type)
+					maxPriority = list->compareMax(maxPriority, parent);
+				else
+					maxPriority = list->compareMin(maxPriority, parent);
+				if (maxPriority != parent) {
+					list->swap(parent, maxPriority);
+					heapifyUp(parent); //Se intercambia la posicion del padre con la del hijo
+
 				}
 			}
 		}
 	}
 
 	//Utilizado para reordenar el heap una vez eliminado el elemento con mayor prioridad
-	void heapifyBubbleDown(int i = 1) {
-		int izq = obtenerIzq(i);
-		int der = obtenerDer(i);
-		int mayorPrioridad = -1;
+	void heapifyDown(int i = 1) {
+		int left = getLeft(i);
+		int right = getRight(i);
+		int maxPriority = -1;
 		if (i > 0) { //El padre siempre es mayor que cero ya que el indice inicia en 1
-			if (tipoHeap)
-				mayorPrioridad = lista->compararMayor(izq, der);//Se busca el mayor entre el hijo y el padre
-			if (!tipoHeap)
-				mayorPrioridad = lista->compararMenor(izq, der);//Se busca el mayor entre los hermanos
-			if (mayorPrioridad != -1) {
-				if (tipoHeap)
-					mayorPrioridad = lista->compararMayor(mayorPrioridad, i);//Se busca el mayor entre el hijo y el padre
-				if (!tipoHeap)
-					mayorPrioridad = lista->compararMenor(mayorPrioridad, i);//Se busca el mayor entre el hijo y el padre
-				if (mayorPrioridad != i) {//Si el mayor es diferente al padre
-					lista->intercambiar(i, mayorPrioridad);
-					heapifyBubbleDown(mayorPrioridad);  //Como hubo un intercambio entre el padre y el hijo, la posicion del antiguo padre cambio con la del hijo
-														//Entonces el que ahora es padre tomo el indice del padre anterior, por eso se repite recursivamente heapify
+			if (type)
+				maxPriority = list->compareMax(left, right);
+			else
+				maxPriority = list->compareMin(left, right);
+			if (maxPriority != -1) {
+				if (type)
+					maxPriority = list->compareMax(maxPriority, i);
+				else
+					maxPriority = list->compareMin(maxPriority, i);
+				if (maxPriority != i) {
+					list->swap(i, maxPriority);
+					heapifyDown(maxPriority);  //Se intercambia la posicion del padre con la del hijo
 				}
 			}
 		}
 	}
 
-	//Utilizado para crear heap a partir de una lista enlazada doble desordenada
-	void crearHeap() {
-		int ultimoPadre = lista->getCantidad() / 2;
-
-		for (int i = ultimoPadre; i > 0; i--) {
-			heapifyBubbleDown(i);
+	//Utilizado para crear heap a partir de una list enlazada doble desordenada
+	void createHeap() {
+		int lastParent = list->getAmount() / 2;
+		for (int i = lastParent; i > 0; i--) {
+			heapifyDown(i);
 		}
 	}
 
-	//Retorna el elemento de mayor prioridad del heap
-	T obtenerElementoPrioritario() {
-		if (!estaVacia()) {
-			T info = lista->obtenerInfoDelPrimero();
-			heapifyBubbleDown();
-
-			return info;
+	//Devuelve el objeto con mayor prioridad en el heap
+	T getMaxPriorityElement() {
+		if (!isEmpty()) {
+			T value = list->getFirstValue();
+			heapifyDown();
+			return value;
 		}
-		return lista->obtenerInfoDelPrimero();
+		return list->getFirstValue();
 	}
 
-	bool estaVacia() {
-		return lista->estaVacia();
+	//Este metodo determina si la lista doble del heap esta vacia
+	bool isEmpty() {
+		return list->isEmpty();
 	}
 
-
-	void eliminar(int pos) {
-		int ultimo = lista->getCantidad();
-		if (pos != ultimo)
-			lista->intercambiar(pos, ultimo);
-		lista->EliminarEnPos(ultimo);
-		heapifyBubbleDown(pos);
+	//Este metodo elimina el objeto en la lista doble del heap en la posicion indicada por parametro
+	void remove(int pos) {
+		int last = list->getAmount();
+		if (pos != last)
+			list->swap(pos, last);
+		list->removePos(last);
+		heapifyDown(pos);
 	}
-
 };
 
 #endif
