@@ -1,5 +1,6 @@
 #include<iostream>
 #include "DoubleList.h"
+#include "Usuario.h"
 
 /*
 	Estudiantes:
@@ -21,5 +22,13 @@ Enlaces visitados:
 using namespace std;
 
 int main() {
+
+	Usuario u1(2, 'n');
+	Usuario u2(4, 'n');
+
+	if (u1 < u2) {
+		cout << "yay" << endl;
+	}
+
 	return 0;
 }
