@@ -15,13 +15,11 @@ public:
 	void setPrioridad(int p) { this->prioridad = p; }
 	void setId(char i) { this->id = i; }
 
-	bool operator > (Usuario const& u) {
-		return prioridad > u.prioridad ? true : false;
-	}
+	//Sobrecarga del operador >, compara si la prioridad es mayor
+	bool operator > (Usuario const& u) { return prioridad > u.prioridad ? true : false; }
 
-	bool operator < (Usuario const& u) {
-		return prioridad < u.prioridad ? true : false;
-	}
+	//Sobrecarga del operador <, compara si la prioridad es menor
+	bool operator < (Usuario const& u) { return prioridad < u.prioridad ? true : false; }
 };
 #endif // !USUARIO_H
 

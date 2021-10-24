@@ -1,6 +1,6 @@
 #include<iostream>
 #include "DoubleList.h"
-#include "Usuario.h"
+#include "PriorityQueue.h"
 
 /*
 	Estudiantes:
@@ -23,11 +23,52 @@ using namespace std;
 
 int main() {
 
-	Usuario u1(2, 'n');
-	Usuario u2(4, 'n');
+	// Crear cola de prioridad de enteros
+	PriorityQueue<int>* p = new PriorityQueue<int>(false);
 
-	if (u1 < u2) {
-		cout << "yay" << endl;
+	// Añadir unos cuantos números
+	p->enqueue(2);
+	p->enqueue(5);
+	p->enqueue(1);
+	p->enqueue(4);
+	p->enqueue(12);
+	p->enqueue(4);
+	p->enqueue(6);
+	p->enqueue(5);
+
+	// Imprime y saca de la cola de prioridad
+	// Maneja las posibles excepciones
+	try {
+		cout << p->dequeue() << endl;
+		cout << p->dequeue() << endl;
+		cout << p->dequeue() << endl;
+		cout << p->dequeue() << endl;
+		cout << p->dequeue() << endl;
+		cout << p->dequeue() << endl;
+		cout << p->dequeue() << endl;
+		cout << p->dequeue() << endl;
+		cout << p->dequeue() << endl;
+	}
+	catch (exception e) {
+		cout << e.what() << endl;
+	}
+
+	// la cola está vacía, añadir un par de números 
+	p->enqueue(1);
+	p->enqueue(3);
+
+	// Construye una cola de prioridad copia
+
+	PriorityQueue<int>* q = new PriorityQueue<int>(p);
+
+	// Imprime los elementos que se copiaron 
+	try {
+		cout << q->dequeue() << endl; // NO SE COPIAN LOS ELEMENTOS DE LA LISTA 
+		cout << q->dequeue() << endl;
+		cout << q->dequeue() << endl;
+	}
+	catch (exception e) {
+		cout << e.what() << endl;
 	}
 
 	return 0;
